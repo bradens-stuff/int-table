@@ -1,6 +1,6 @@
 struct options {
-    int num_bits;
-    int markdown;
+    long num_bits;
+    long markdown;
 };
 
 void parse_args(char **argv, struct options *o);

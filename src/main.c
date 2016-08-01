@@ -29,7 +29,7 @@ static void
 render_table(struct options *o)
 {/*{{{*/
     char bin_buf[65] = "";
-    int i;
+    long i;
 
     printf("Table for a/an %u-bit integer: \n\n", o->num_bits);
     print_header(o->markdown);

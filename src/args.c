@@ -14,7 +14,7 @@ parse_args(char **argv, struct options *o)
 
     while(arg = *(args++)){
         if(!strncmp(arg, "-nb", 3))
-            o->num_bits = atoi(*args);
+            o->num_bits = atol(*args);
 
         if(!strncmp(arg, "-md", 3))
             o->markdown = 1;
