@@ -1,25 +1,31 @@
-/* file: binary.c
- * Table renderer by Braden Best
- *   Renders a table of numbers
- *   Github flavored markdown style
- */
-
-#include <stdlib.h>
+#include <string.h>
 
 #include "binary.h"
 
-char *get_bin(long int n, int num_bits)
-{
-  char *ret = calloc(sizeof(char),num_bits+1);
-  int i, t_ptr = 0;
-  for (i = num_bits-1; i >= 0; i--){
-    ret[t_ptr++] = (n>>i & 1) + '0';
-  }
-  ret[t_ptr] = 0;
-  return ret;
-}
+static void revcpy(char *dest, char *src);
 
-int get_sign_bit(long int n, int num_bits)
-{
-  return n >> (num_bits-1);
-}
+void
+to_binary(char *buf, long n, int padding)
+{/*{{{*/
+    char bbuf[65] = "",
+         *bbufp = bbuf;
+
+    while(n || strlen(bbuf) < padding){
+        *(bbufp++) = (n % 2) + '0';
+        n /= 2;
+    }
+
+    revcpy(buf, bbuf);
+}/*}}}*/
+
+static void
+revcpy(char *dest, char *src)
+{/*{{{*/
+    char *srcp = src;
+
+    while(*(srcp + 1))
+        srcp++;
+
+    while(srcp - src >= 0)
+        *(dest++) = *(srcp--);
+}/*}}}*/

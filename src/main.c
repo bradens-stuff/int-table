@@ -1,41 +1,56 @@
-/* file: main.c
- * Table renderer by Braden Best
- *   Renders a table of numbers
- *   Github flavored markdown style
- */
-
 #include <stdio.h>
-#include <stdlib.h>
+#include <string.h>
 
 #include "binary.h"
 #include "signed.h"
+#include "args.h"
 
-int main(int argc, char **argv)
-{
-  unsigned int i, num_bits = 4;
-  int md = 0;
-  if(argc > 1)
-    num_bits = atoi(argv[1]);
-  if(argc > 2)
-    if(argv[2][0] == 'm' && argv[2][1] == 'd')
-      md = 1;
+static void print_header(int markdown);
+static void render_table(struct options *o);
 
-  printf("Table for a/an %u-bit integer: \n\n", num_bits);
+const char *formats[] = {
+    "unsigned\tsigned\t\thex\t\tbinary\t\tsign bit\n",
+    "| Unsigned | Signed | Hex | Binary | Sign Bit |\n",
+    "--------\t------\t\t---\t\t------\t\t--------\n",
+    "|:--------:|:------:|:---:|:------:|:--------:|\n",
+    "%u\t\t%i\t\t%X\t\t%s\t\t%c\n",
+    "| %u | %i | %X | %s | %c |\n"
 
-  if(md){
-    printf("| Unsigned | Signed | Hex | Binary | Sign Bit |\n");
-    printf("|:--------:|:------:|:---:|:------:|:--------:|\n");
-    for (i = 0; i < (1<<num_bits); i++)
-      printf("| %u | %i | %X | %s | %u |\n", i, get_signed(i, num_bits), i, get_bin(i, num_bits), get_sign_bit(i, num_bits));
-    printf("\n| Unsigned | Signed | Hex | Binary | Sign Bit |\n");
-    printf("|:--------:|:------:|:---:|:------:|:--------:|\n");
-  }else{
-    printf("unsigned\tsigned\t\thex\t\tbinary\t\tsign bit\n");
-    printf("--------\t------\t\t---\t\t------\t\t--------\n");
-    for (i = 0; i < (1<<num_bits); i++)
-      printf("%u\t\t%i\t\t%X\t\t%s\t\t%u\n", i, get_signed(i, num_bits), i, get_bin(i, num_bits), get_sign_bit(i, num_bits));
-    printf("--------\t------\t\t---\t\t------\t\t--------\n");
-    printf("unsigned\tsigned\t\thex\t\tbinary\t\tsign bit\n");
-  }
-  return 0;
-}
+};
+
+static void
+print_header(int markdown)
+{/*{{{*/
+    printf(formats[0 + markdown]);
+    printf(formats[2 + markdown]);
+}/*}}}*/
+
+static void
+render_table(struct options *o)
+{/*{{{*/
+    char bin_buf[65] = "";
+    int i;
+
+    printf("Table for a/an %u-bit integer: \n\n", o->num_bits);
+    print_header(o->markdown);
+
+    for(i = 0; i < (1 << o->num_bits); i++){
+        memset(bin_buf, 0, 65);
+        to_binary(bin_buf, i, o->num_bits);
+        printf(formats[4 + o->markdown], i, get_signed(i, o->num_bits), i, bin_buf, *bin_buf);
+    }
+
+    printf("\n");
+    print_header(o->markdown);
+}/*}}}*/
+
+int
+main(int argc, char **argv)
+{/*{{{*/
+    struct options o = {4, 0};
+
+    parse_args(argv, &o);
+    render_table(&o);
+
+    return 0;
+}/*}}}*/
